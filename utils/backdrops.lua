@@ -27,6 +27,9 @@ function BackDrops:init()
       images = {},
       images_dir = wezterm.config_dir .. '/backdrops/',
       no_bg = false,
+      -- color of the tint layer drawn over the background image; follows the
+      -- active color scheme, set via `BackDrops:set_color`
+      bg_color = colors.background,
    }
    return setmetatable(backdrops, self)
 end
@@ -73,7 +76,7 @@ function BackDrops:_gen_opts()
    end
 
    table.insert(bg_opts, {
-      source = { Color = colors.background },
+      source = { Color = self.bg_color },
       height = '120%',
       width = '120%',
       vertical_offset = '-10%',
@@ -90,7 +93,7 @@ end
 function BackDrops:_gen_no_img_opts()
    return {
       {
-         source = { Color = colors.background },
+         source = { Color = self.bg_color },
          height = '120%',
          width = '120%',
          vertical_offset = '-10%',
@@ -119,10 +122,30 @@ end
 ---@param window Window WezTerm Window see: https://wezfurlong.org/wezterm/config/lua/window/index.html
 ---@param background_opts BackgroundLayer[] background option
 function BackDrops:_set_opt(window, background_opts)
-   window:set_config_overrides({
-      background = background_opts,
-      enable_tab_bar = window:effective_config().enable_tab_bar,
-   })
+   -- merge into the existing overrides instead of replacing them, otherwise a
+   -- background change would wipe an active `colors` override (scheme switch)
+   local overrides = window:get_config_overrides() or {}
+   overrides.background = background_opts
+   overrides.enable_tab_bar = window:effective_config().enable_tab_bar
+   window:set_config_overrides(overrides)
+end
+
+---Set the tint/background color used by the background layers. Pass a `Window`
+---to immediately repaint the current window with the new color.
+---@param color string css color string
+---@param window Window? WezTerm `Window`
+function BackDrops:set_color(color, window)
+   self.bg_color = color
+   if window ~= nil then
+      self:_set_opt(window, self:current_opts())
+   end
+   return self
+end
+
+---Build the background layers for the current state (image+tint or focus mode).
+---@return BackgroundLayer[]
+function BackDrops:current_opts()
+   return self.no_img and self:_gen_no_img_opts() or self:_gen_opts()
 end
 
 ---Convert the `images` array to a table of `InputSelector` choices

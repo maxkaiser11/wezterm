@@ -1,9 +1,36 @@
 local wezterm = require('wezterm')
 local platform = require('utils.platform')
 local backdrops = require('utils.backdrops')
+local color_schemes = require('colors.schemes')
+local tab_title = require('events.tab-title')
 local act = wezterm.action
 
 local mod = {}
+
+-- color scheme switching --
+local current_scheme_idx = 1
+
+local function apply_color_scheme(window, idx)
+   local entry = color_schemes[idx]
+
+   -- the custom tab-bar renderer and the background tint don't read `colors`,
+   -- so push the scheme to both of them as well. Set the tab palette before the
+   -- repaint triggered by `set_config_overrides` so the new colors are picked up.
+   tab_title.set_palette(entry.tab)
+   backdrops:set_color(entry.scheme.background)
+
+   local overrides = window:get_config_overrides() or {}
+   overrides.colors = entry.scheme
+   overrides.background = backdrops:current_opts()
+   window:set_config_overrides(overrides)
+   window:toast_notification('WezTerm', 'Color scheme: ' .. entry.name, nil, 2000)
+end
+
+-- pre-built choices for the fuzzy color-scheme selector
+local color_scheme_choices = {}
+for i, entry in ipairs(color_schemes) do
+   color_scheme_choices[i] = { id = tostring(i), label = entry.name }
+end
 
 if platform.is_mac then
    mod.SUPER = 'SUPER'
@@ -170,6 +197,35 @@ local keys = {
       action = wezterm.action_callback(function(window, _pane)
          backdrops:toggle_focus(window)
       end)
+   },
+
+   -- color scheme controls --
+   -- cycle to the next color scheme
+   {
+      key = 'c',
+      mods = mod.SUPER,
+      action = wezterm.action_callback(function(window, _pane)
+         current_scheme_idx = (current_scheme_idx % #color_schemes) + 1
+         apply_color_scheme(window, current_scheme_idx)
+      end),
+   },
+   -- fuzzy-pick a color scheme
+   {
+      key = 'c',
+      mods = mod.SUPER_REV,
+      action = act.InputSelector({
+         title = 'InputSelector: Select Color Scheme',
+         choices = color_scheme_choices,
+         fuzzy = true,
+         fuzzy_description = 'Select Color Scheme: ',
+         action = wezterm.action_callback(function(window, _pane, id)
+            if not id then
+               return
+            end
+            current_scheme_idx = tonumber(id)
+            apply_color_scheme(window, current_scheme_idx)
+         end),
+      }),
    },
 
    -- panes --

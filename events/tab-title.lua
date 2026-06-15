@@ -154,6 +154,9 @@ local RV = {
 }
 
 
+---The active tab-bar palette. Defaults to the catppuccin values; replaced at
+---runtime by `M.set_palette` when the color scheme is switched (see
+---`config/bindings.lua` and `colors/schemes.lua`).
 ---@type table<string, Cells.SegmentColors>
 -- stylua: ignore
 local colors = {
@@ -181,6 +184,14 @@ local colors = {
    progress_indeterminate_hover   = { bg = '#7188b0', fg = '#f5e0dc' },
    progress_indeterminate_active  = { bg = '#89b4fa', fg = '#f5e0dc' },
 }
+
+---Replace the tab-bar palette. Called when the color scheme is switched so the
+---custom tab renderer follows the active scheme. The next tab repaint picks up
+---the new colors (switching the scheme triggers a repaint).
+---@param palette table<string, Cells.SegmentColors>
+M.set_palette = function(palette)
+   colors = palette
+end
 
 ---
 -- ================
