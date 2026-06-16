@@ -1,6 +1,16 @@
 local gpu_adapters = require('utils.gpu-adapter')
 local backdrops = require('utils.backdrops')
-local colors = require('colors.custom')
+local color_schemes = require('colors.schemes')
+local color_state = require('colors.state')
+local tab_title = require('events.tab-title')
+
+-- Restore the color scheme selected on the previous run (Super+C / Super+Ctrl+C).
+-- Defaults to the first scheme (Catppuccin Mocha) when nothing was saved. The
+-- custom tab-bar palette and the background tint don't read `colors`, so push
+-- the active scheme to both of them here too (mirrors `apply_color_scheme`).
+local active_scheme = color_schemes[color_state.initial_index()]
+tab_title.set_palette(active_scheme.tab)
+backdrops:set_color(active_scheme.scheme.background)
 
 ---@type Config
 return {
@@ -20,7 +30,7 @@ return {
    cursor_blink_rate = 650,
 
    -- color scheme
-   colors = colors,
+   colors = active_scheme.scheme,
 
    -- background: pass in `true` if you want wezterm to start with focus mode on (no bg images)
    background = backdrops:initial_options({ no_img = false }),

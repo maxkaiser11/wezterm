@@ -3,3 +3,6 @@
 /lua_modules
 /.luarocks
 .DS_Store
+
+# persisted runtime color-scheme selection (see colors/state.lua)
+/.color-scheme

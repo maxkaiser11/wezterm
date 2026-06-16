@@ -2,13 +2,15 @@ local wezterm = require('wezterm')
 local platform = require('utils.platform')
 local backdrops = require('utils.backdrops')
 local color_schemes = require('colors.schemes')
+local color_state = require('colors.state')
 local tab_title = require('events.tab-title')
 local act = wezterm.action
 
 local mod = {}
 
 -- color scheme switching --
-local current_scheme_idx = 1
+-- start on whatever scheme was selected last run (restored in `config/appearance.lua`)
+local current_scheme_idx = color_state.initial_index()
 
 local function apply_color_scheme(window, idx)
    local entry = color_schemes[idx]
@@ -24,6 +26,9 @@ local function apply_color_scheme(window, idx)
    overrides.background = backdrops:current_opts()
    window:set_config_overrides(overrides)
    window:toast_notification('WezTerm', 'Color scheme: ' .. entry.name, nil, 2000)
+
+   -- remember the choice so it's restored on the next launch
+   color_state.save_name(entry.name)
 end
 
 -- pre-built choices for the fuzzy color-scheme selector
