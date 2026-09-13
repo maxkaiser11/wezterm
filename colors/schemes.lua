@@ -100,6 +100,17 @@ local catppuccin_tab = {
 
 -- stylua: ignore
 local schemes = {
+   -- Everforest Dark (medium) -- palette from sainnhe/everforest
+   entry('Everforest Dark', {
+      fg = '#d3c6aa', bg = '#2d353b',
+      cursor_bg = '#d3c6aa', cursor_fg = '#2d353b',
+      selection_bg = '#475258', selection_fg = '#d3c6aa',
+      ansi    = { '#4b565c', '#e67e80', '#a7c080', '#dbbc7f', '#7fbbb3', '#d699b6', '#83c092', '#9da9a0' },
+      brights = { '#7a8478', '#e67e80', '#a7c080', '#dbbc7f', '#7fbbb3', '#d699b6', '#83c092', '#d3c6aa' },
+      tab_active_bg = '#475258', tab_active_fg = '#d3c6aa',
+      tab_inactive_bg = '#343f44', tab_inactive_fg = '#859289',
+      accent = '#e69875',
+   }),
    {
       name = 'Catppuccin Mocha',
       scheme = require('colors.custom'),

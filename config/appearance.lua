@@ -5,7 +5,7 @@ local color_state = require('colors.state')
 local tab_title = require('events.tab-title')
 
 -- Restore the color scheme selected on the previous run (Super+C / Super+Ctrl+C).
--- Defaults to the first scheme (Catppuccin Mocha) when nothing was saved. The
+-- Defaults to the first scheme (Everforest Dark) when nothing was saved. The
 -- custom tab-bar palette and the background tint don't read `colors`, so push
 -- the active scheme to both of them here too (mirrors `apply_color_scheme`).
 local active_scheme = color_schemes[color_state.initial_index()]
