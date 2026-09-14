@@ -15,6 +15,7 @@ local GLOB_PATTERN = '*.{jpg,jpeg,png,gif,bmp,ico,tiff,pnm,dds,tga}'
 ---@field current_idx number index of current image
 ---@field images string[] background images
 ---@field images_dir string directory of background images. Default is `wezterm.config_dir .. '/backdrops/'`
+---@field default_image string? file name of the image to select on startup
 ---@field no_img boolean focus mode on or off
 local BackDrops = {}
 BackDrops.__index = BackDrops
@@ -26,6 +27,7 @@ function BackDrops:init()
       current_idx = 1,
       images = {},
       images_dir = wezterm.config_dir .. '/backdrops/',
+      default_image = 'x_wallpaper_seven_alexandros.png',
       no_bg = false,
       -- color of the tint layer drawn over the background image; follows the
       -- active color scheme, set via `BackDrops:set_color`
@@ -49,6 +51,17 @@ function BackDrops:set_images_dir(path)
    return self
 end
 
+---Override the default image selected on startup
+---
+--- INFO:
+---  This function must be invoked before `scan_images_dir()`
+---
+---@param file_name string file name of the image, as it appears in `images_dir`
+function BackDrops:set_default_image(file_name)
+   self.default_image = file_name
+   return self
+end
+
 ---**MUST BE RUN BEFORE ALL OTHER `BackDrops` methods**
 ---Sets the `images` after instantiating `BackDrops`.
 ---
@@ -59,6 +72,18 @@ end
 ---   initial load of the Terminal config.
 function BackDrops:scan_images_dir()
    self.images = wezterm.glob(self.images_dir .. GLOB_PATTERN)
+
+   -- start on `default_image` when it is present, otherwise fall back to the first image
+   -- (match on the path suffix so the directory separator does not matter)
+   if self.default_image ~= nil then
+      for idx, file in ipairs(self.images) do
+         if file:sub(-#self.default_image) == self.default_image then
+            self.current_idx = idx
+            break
+         end
+      end
+   end
+
    return self
 end
 
