@@ -16,30 +16,31 @@ if platform.is_win then
    options.ssh_domains = {
       {
          name = 'ssh:wsl',
-         username = 'kevin',
+         username = 'maxkaiser',
          remote_address = 'localhost',
          multiplexing = 'None',
-         default_prog = { 'fish', '-l' },
+         default_prog = { 'bash', '-l' },
          assume_shell = 'Posix',
       },
    }
 
    options.wsl_domains = {
       {
-         name = 'wsl:ubuntu-fish',
+         name = 'wsl:ubuntu',
          distribution = 'Ubuntu',
-         username = 'kevin',
-         default_cwd = '/home/kevin',
-         default_prog = { 'fish', '-l' },
+         username = 'maxkaiser',
+         default_cwd = '/home/maxkaiser',
+         default_prog = { 'bash', '-l' },
       },
       {
-         name = 'wsl:ubuntu-bash',
-         distribution = 'Ubuntu',
-         username = 'kevin',
-         default_cwd = '/home/kevin',
+         name = 'wsl:ubuntu-22.04',
+         distribution = 'Ubuntu-22.04',
          default_prog = { 'bash', '-l' },
       },
    }
+
+   -- WSL is the primary environment: new windows/tabs open in Ubuntu
+   options.default_domain = 'wsl:ubuntu'
 end
 
 return options

@@ -31,7 +31,7 @@ local function build_choices()
    local choices_data = {}
    local idx = 1
 
-   -- Add launch menu items (DefaultDomain)
+   -- Add launch menu items (local domain, since the default domain may be WSL)
    for _, v in ipairs(launch_menu) do
       cells:update_segment_text('label_text', v.label)
 
@@ -41,7 +41,7 @@ local function build_choices()
       })
       table.insert(choices_data, {
          args = v.args,
-         domain = 'DefaultDomain',
+         domain = { DomainName = 'local' },
       })
       idx = idx + 1
    end
